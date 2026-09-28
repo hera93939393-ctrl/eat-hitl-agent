@@ -41,13 +41,13 @@ CSS = """
     padding: 16px 22px; border-radius: 10px; margin: 6px 0 18px 0;
     border-left: 6px solid #E0A800;
 }
+.field-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
 .field-icon {
-    width: 34px; height: 34px; border-radius: 50%;
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
     background: #EAF3FF; color: #2F6FED; display: flex;
     align-items: center; justify-content: center; font-size: 16px;
-    margin-bottom: 6px;
 }
-.field-label { color: #6B7686; font-size: 0.78rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+.field-label { color: #6B7686; font-size: 1.56rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
 .field-value { color: #16233F; font-size: 0.95rem; margin-top: 2px; line-height: 1.4; }
 .badge {
     display: inline-block; padding: 3px 12px; border-radius: 999px;
@@ -98,8 +98,10 @@ def render_field_card(col, icon: str, label: str, value: str) -> None:
     with col:
         with st.container(border=True):
             st.markdown(
-                f'<div class="field-icon">{icon}</div>'
-                f'<div class="field-label">{label}</div>'
+                f'<div class="field-header">'
+                f'<span class="field-icon">{icon}</span>'
+                f'<span class="field-label">{label}</span>'
+                f'</div>'
                 f'<div class="field-value">{value}</div>',
                 unsafe_allow_html=True,
             )
@@ -130,15 +132,19 @@ def render_detail(app, case_id: str) -> None:
         with st.container(border=True):
             if "재판정 횟수" in payload:
                 st.markdown(
-                    '<div class="field-icon">🔁</div>'
-                    '<div class="field-label">재판정 횟수</div>'
+                    '<div class="field-header">'
+                    '<span class="field-icon">🔁</span>'
+                    '<span class="field-label">재판정 횟수</span>'
+                    '</div>'
                     f'<div class="field-value">{payload["재판정 횟수"]} (최대 3회, 초과 시 자동 반려)</div>',
                     unsafe_allow_html=True,
                 )
             else:
                 st.markdown(
-                    '<div class="field-icon">🔁</div>'
-                    '<div class="field-label">재판정 횟수</div>'
+                    '<div class="field-header">'
+                    '<span class="field-icon">🔁</span>'
+                    '<span class="field-label">재판정 횟수</span>'
+                    '</div>'
                     '<div class="field-value">아직 없음</div>',
                     unsafe_allow_html=True,
                 )
