@@ -13,13 +13,15 @@
 ## 2. 파이프라인 구조도
 
 ```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 55, 'rankSpacing': 70}}}%%
 flowchart TD
     START(["신청 접수"]) --> JUDGE["judge<br/>규칙 기반 판정"]
     JUDGE -->|"자동 처리"| FINALIZE["finalize<br/>최종 결과 확정"]
     JUDGE -->|"사람확인필요"| REVIEW[["review<br/>interrupt로 멈춤"]]
     REVIEW -->|"승인 · 수정후승인 · 반려"| FINALIZE
-    REVIEW -->|"다시 판정"| REVIEW
-    REVIEW -->|"3회 초과"| FINALIZE
+    REVIEW -->|"다시 판정"| RETRY{"3회<br/>초과?"}
+    RETRY -->|"아니오"| REVIEW
+    RETRY -->|"예(자동 반려)"| FINALIZE
     FINALIZE --> RESULT(["결과 반영"])
 
     classDef gate fill:#FFE066,stroke:#B8860B,color:#14284B,stroke-width:2px;
@@ -28,7 +30,8 @@ flowchart TD
 
 - **judge의 자동 처리 두 갈래**: 필수서류 누락 → 보완요청 / 필수서류 충족 + 특이사항 없음 → 자동승인
   (둘 다 사람을 거치지 않고 finalize로 직행). 제재이력·주소불일치·인허가 임박·만료 중 하나라도
-  있으면 사람확인필요로 판정되어 노란색 review(HITL 게이트)로 이동
+  있으면 사람확인필요로 판정되어 노란색 review(HITL 게이트)로 이동. 다시 판정을 누르면 별도의
+  3회 초과 여부 노드에서 갈라져 review로 되돌아가거나(3회 미만) 자동 반려로 빠짐(3회 초과)
 - **State**: `case`(신청 정보), `verdict`/`reason`/`stop_reasons`(judge 결과), `decision`(담당자 응답),
   `retry_count`, `final_status`/`final_reason`/`final_conditions`(최종 결과)
 - **judge 내부 분리**: 자동승인/보완요청/사람확인필요 여부(`verdict`)는 여전히 규칙(필수서류·제재이력·
