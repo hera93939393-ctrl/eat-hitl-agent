@@ -10,14 +10,34 @@
 |---|---|
 | `cases.py` | 모의 신청 케이스 6건 (실제 개인/기업정보 아님) |
 | `agent.py` | LangGraph 그래프 (judge → review(interrupt) → finalize) |
+| `llm_judge.py` | OpenAI API로 1차 판정근거 문장을 생성하는 헬퍼 |
 | `cli.py` | 터미널 CLI 실행기 (InMemorySaver) |
 | `app.py` | Streamlit 웹 데모 (SqliteSaver로 대기 상태 영속화) |
 
 ## 실행 방법
 
 ```bash
-pip install langgraph langgraph-checkpoint-sqlite streamlit
+pip install -r requirements.txt
 ```
+
+### OpenAI API 키 설정
+
+`judge` 단계에서 판정근거 문장을 OpenAI API로 생성합니다(등록 여부 자체는 규칙으로 확정되고,
+LLM은 그 이유를 설명하는 문장만 생성합니다). 실행 전 환경변수로 키를 설정하세요. **키를 코드나
+저장소에 직접 적지 마세요.**
+
+```powershell
+# PowerShell
+$env:OPENAI_API_KEY = "sk-..."
+```
+
+```bash
+# bash
+export OPENAI_API_KEY="sk-..."
+```
+
+키가 없으면 자동으로 규칙 기반 기본 문구로 대체되어 데모 자체는 계속 동작합니다.
+필요하면 `OPENAI_MODEL` 환경변수로 모델을 바꿀 수 있습니다(기본값 `gpt-4o-mini`).
 
 ### 1. 터미널 CLI로 실행
 

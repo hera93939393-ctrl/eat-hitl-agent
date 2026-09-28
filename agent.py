@@ -6,6 +6,7 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.types import interrupt
 
 from cases import REQUIRED_DOCS
+from llm_judge import REGULATION_REFS, generate_reason
 
 MAX_RETRY = 3
 
@@ -33,37 +34,32 @@ class ReviewState(TypedDict, total=False):
 
 
 def judge(state: ReviewState) -> dict:
+    """1차 판정. 자동/사람확인 여부는 규칙으로 확정하고(계산 가능한 기준), 그 근거 문장만
+    OpenAI API로 생성한다 — LLM 출력이 등록 여부 자체를 좌우하지 않도록 분리."""
     case = state["case"]
     missing = [d for d in REQUIRED_DOCS if d not in case["submitted_docs"]]
     if missing:
-        return {
-            "verdict": "보완요청",
-            "reason": f"필수서류 누락: {', '.join(missing)}",
-            "stop_reasons": [],
-        }
+        reason = generate_reason(case, "보완요청", [], [], missing=missing)
+        return {"verdict": "보완요청", "reason": reason, "stop_reasons": []}
 
     stop_reasons = []
+    citations = []
     if case["has_sanction_history"]:
         stop_reasons.append("최근 1년 내 제재/신고 이력 있음")
+        citations.append(REGULATION_REFS["sanction"])
     if case["address_mismatch"]:
         stop_reasons.append("사업자등록 주소와 실제 시설 소재지 불일치")
+        citations.append(REGULATION_REFS["address"])
     if case["license_days_left"] <= 0:
         stop_reasons.append("인허가증 유효기간 만료")
+        citations.append(REGULATION_REFS["license"])
     elif case["license_days_left"] <= 30:
         stop_reasons.append(f"인허가증 유효기간 임박(잔여 {case['license_days_left']}일)")
+        citations.append(REGULATION_REFS["license"])
 
-    if stop_reasons:
-        return {
-            "verdict": "사람확인필요",
-            "reason": "필수서류는 충족했으나 특이사항 확인이 필요함",
-            "stop_reasons": stop_reasons,
-        }
-
-    return {
-        "verdict": "자동승인",
-        "reason": "필수서류 충족, 특이사항 없음",
-        "stop_reasons": [],
-    }
+    verdict = "사람확인필요" if stop_reasons else "자동승인"
+    reason = generate_reason(case, verdict, stop_reasons, citations)
+    return {"verdict": verdict, "reason": reason, "stop_reasons": stop_reasons}
 
 
 def route_after_judge(state: ReviewState) -> str:
