@@ -83,8 +83,13 @@ flowchart TD
 뺀 것: 실제 서류 파일 미리보기(모의 케이스라 서류 원본이 없음), 담당자 인증/로그인(1인 데모라
 생략), 대기 3일 초과 시 자동 처리 같은 SLA 규칙(제출 기한 내 범위 밖이라 이번엔 구현하지 않음)
 
-> 스크린샷은 `python -m streamlit run app.py` 실행 후 대기 목록 화면과 상세 심사 화면을
-> 캡처해 이 폴더에 추가해 주세요 (`docs/screenshot_list.png`, `docs/screenshot_detail.png`).
+**대기 목록 화면** — 승인 대기 건과 처리 완료 건이 상태 배지와 함께 사이드바에 나뉘어 보임
+
+![대기 목록 화면](docs/screenshot_list.png)
+
+**상세 심사 화면** — 요청 원문부터 판정근거(OpenAI API로 생성, 관련 규정 인용 포함)까지 한 화면에서 확인
+
+![상세 심사 화면](docs/screenshot_detail.png)
 
 ## 6. 프로젝트 회고
 
