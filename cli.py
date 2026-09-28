@@ -33,7 +33,7 @@ def ask_terminal(screen: dict) -> dict:
 
 
 def run_case(app, case: dict) -> dict:
-    config = {"configurable": {"thread_id": case["case_id"]}}
+    config = {"configurable": {"thread_id": case["case_id"]}, "recursion_limit": 50}
     result = app.invoke({"case": case, "retry_count": 0}, config=config)
 
     while "__interrupt__" in result:

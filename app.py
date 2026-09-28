@@ -89,7 +89,7 @@ def get_app():
 
 
 def case_config(case_id: str) -> dict:
-    return {"configurable": {"thread_id": case_id}}
+    return {"configurable": {"thread_id": case_id}, "recursion_limit": 50}
 
 
 def ensure_intake(app) -> None:
