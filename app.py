@@ -37,9 +37,9 @@ CSS = """
     padding: 18px 24px; border-radius: 14px; margin-bottom: 1.4rem;
 }
 .detail-title {
-    background: #EAF3FF; color: #14284B; font-weight: 800; font-size: 1.25rem;
-    padding: 14px 20px; border-radius: 10px; margin: 6px 0 18px 0;
-    border-left: 6px solid #2F6FED;
+    background: #FFE066; color: #14284B; font-weight: 800; font-size: 1.55rem;
+    padding: 16px 22px; border-radius: 10px; margin: 6px 0 18px 0;
+    border-left: 6px solid #E0A800;
 }
 .field-icon {
     width: 34px; height: 34px; border-radius: 50%;
