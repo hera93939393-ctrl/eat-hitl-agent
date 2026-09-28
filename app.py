@@ -1,6 +1,7 @@
 """eaT 공급업체 서류심사 HITL 승인 데모 (Streamlit)."""
 
 import sqlite3
+from pathlib import Path
 
 import streamlit as st
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -9,7 +10,7 @@ from langgraph.types import Command
 from agent import build_graph
 from cases import MOCK_CASES
 
-DB_PATH = "eat_hitl.db"
+DB_PATH = str(Path(__file__).parent / "eat_hitl.db")
 
 CASES_BY_ID = {c["case_id"]: c for c in MOCK_CASES}
 
