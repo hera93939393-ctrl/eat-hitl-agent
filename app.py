@@ -12,6 +12,52 @@ from cases import MOCK_CASES
 
 DB_PATH = str(Path(__file__).parent / "eat_hitl.db")
 
+STATUS_BADGE = {
+    "자동승인": ("badge-blue", "⚡"),
+    "보완요청": ("badge-gray", "📎"),
+    "승인": ("badge-green", "✅"),
+    "조건부승인": ("badge-amber", "⚠️"),
+    "반려": ("badge-red", "⛔"),
+}
+
+CSS = """
+<style>
+.block-container { padding-top: 2rem; max-width: 1100px; }
+.top-pill {
+    display: block; text-align: center; margin: 0 auto 1.6rem auto;
+    background: linear-gradient(90deg, #3E8EF7, #63B3FF);
+    color: #fff; font-weight: 600; font-size: 0.95rem;
+    padding: 10px 0; border-radius: 999px; width: fit-content;
+    padding-left: 28px; padding-right: 28px;
+    box-shadow: 0 4px 14px rgba(63,142,247,0.28);
+}
+h1 { color: #14284B !important; font-weight: 800 !important; }
+.field-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #EAF3FF; color: #2F6FED; display: flex;
+    align-items: center; justify-content: center; font-size: 16px;
+    margin-bottom: 6px;
+}
+.field-label { color: #6B7686; font-size: 0.78rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+.field-value { color: #16233F; font-size: 0.95rem; margin-top: 2px; line-height: 1.4; }
+.badge {
+    display: inline-block; padding: 3px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+}
+.badge-blue { background: #EAF3FF; color: #2F6FED; }
+.badge-gray { background: #F1F2F5; color: #5B6472; }
+.badge-green { background: #E7F8ED; color: #1E9E4B; }
+.badge-amber { background: #FFF4E0; color: #B8720A; }
+.badge-red { background: #FDEBEB; color: #E1483F; }
+.pass-banner {
+    background: #EAF3FF; border-left: 4px solid #2F6FED; color: #14284B;
+    padding: 12px 16px; border-radius: 8px; font-size: 0.92rem; margin: 14px 0;
+}
+section[data-testid="stSidebar"] { background: #F7FAFF; }
+div[data-testid="stSidebarUserContent"] h3 { color: #14284B; }
+</style>
+"""
+
 CASES_BY_ID = {c["case_id"]: c for c in MOCK_CASES}
 
 
@@ -34,31 +80,69 @@ def ensure_intake(app) -> None:
             app.invoke({"case": case, "retry_count": 0}, config=config)
 
 
+def status_badge_html(status: str) -> str:
+    css_class, icon = STATUS_BADGE.get(status, ("badge-gray", "•"))
+    return f'<span class="badge {css_class}">{icon} {status}</span>'
+
+
+def render_field_card(col, icon: str, label: str, value: str) -> None:
+    with col:
+        with st.container(border=True):
+            st.markdown(
+                f'<div class="field-icon">{icon}</div>'
+                f'<div class="field-label">{label}</div>'
+                f'<div class="field-value">{value}</div>',
+                unsafe_allow_html=True,
+            )
+
+
 def render_detail(app, case_id: str) -> None:
     snapshot = app.get_state(case_config(case_id))
     payload = snapshot.interrupts[0].value
     case = CASES_BY_ID[case_id]
 
-    st.subheader(f"[{case_id}] {case['company']} 심사 확인")
+    st.markdown(f"### 📋 [{case_id}] {case['company']} 심사 확인")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"**요청 원문**\n\n{payload['요청 원문']}")
-        st.markdown(f"**제출서류**: {payload['제출서류']}")
-    with col2:
-        st.markdown(f"**AI 판정**: {payload['AI 판정']}")
-        st.markdown(f"**판정근거**: {payload['판정근거']}")
-        st.markdown(f"**멈춘 이유**: {payload['멈춘 이유']}")
+    row1 = st.columns(2)
+    render_field_card(row1[0], "📝", "요청 원문", payload["요청 원문"])
+    render_field_card(row1[1], "📎", "제출서류", payload["제출서류"])
 
-    st.warning(f"통과시키면: {payload['통과시키면']}")
-    if "재판정 횟수" in payload:
-        st.caption(f"재판정 횟수: {payload['재판정 횟수']} (최대 3회, 초과 시 자동 반려)")
+    row2 = st.columns(2)
+    render_field_card(row2[0], "🤖", "AI 판정", payload["AI 판정"])
+    render_field_card(row2[1], "📐", "판정근거", payload["판정근거"])
 
-    action = st.radio(
+    row3 = st.columns(2)
+    stop_col, retry_col = row3
+    render_field_card(stop_col, "🛑", "멈춘 이유", payload["멈춘 이유"])
+    with retry_col:
+        with st.container(border=True):
+            if "재판정 횟수" in payload:
+                st.markdown(
+                    '<div class="field-icon">🔁</div>'
+                    '<div class="field-label">재판정 횟수</div>'
+                    f'<div class="field-value">{payload["재판정 횟수"]} (최대 3회, 초과 시 자동 반려)</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    '<div class="field-icon">🔁</div>'
+                    '<div class="field-label">재판정 횟수</div>'
+                    '<div class="field-value">아직 없음</div>',
+                    unsafe_allow_html=True,
+                )
+
+    st.markdown(
+        f'<div class="pass-banner">🚀 <b>통과시키면</b> — {payload["통과시키면"]}</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("**처리 선택**")
+    action = st.segmented_control(
         "처리 선택",
         ["승인", "수정 후 승인", "반려", "다시 판정"],
+        default="승인",
         key=f"action_{case_id}",
-        horizontal=True,
+        label_visibility="collapsed",
     )
 
     extra = ""
@@ -85,8 +169,10 @@ def render_detail(app, case_id: str) -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="eaT 서류심사 승인 데모", layout="wide")
-    st.title("공공급식통합플랫폼(eaT) 공급업체 서류심사 — 승인 데모")
+    st.set_page_config(page_title="eaT 서류심사 승인 데모", layout="wide", page_icon="🍚")
+    st.markdown(CSS, unsafe_allow_html=True)
+    st.markdown('<span class="top-pill">HITL Approval Demo</span>', unsafe_allow_html=True)
+    st.title("공공급식통합플랫폼(eaT) 공급업체 서류심사")
 
     app = get_app()
     ensure_intake(app)
@@ -99,16 +185,21 @@ def main() -> None:
         else:
             done.append((case, snapshot.values))
 
-    st.sidebar.header(f"승인 대기 ({len(pending)}건)")
+    st.sidebar.markdown(f"### 🕐 승인 대기 ({len(pending)}건)")
     for case in pending:
-        label = f"{case['case_id']} · {case['company']}"
-        if st.sidebar.button(label, key=f"select_{case['case_id']}", use_container_width=True):
-            st.session_state["selected"] = case["case_id"]
+        with st.sidebar.container(border=True):
+            st.markdown(f"**{case['case_id']} · {case['company']}**")
+            if st.button("확인하기", key=f"select_{case['case_id']}", use_container_width=True):
+                st.session_state["selected"] = case["case_id"]
 
-    st.sidebar.header(f"처리 완료 ({len(done)}건)")
+    st.sidebar.markdown(f"### ✅ 처리 완료 ({len(done)}건)")
     for case, values in done:
         status = values.get("final_status", "-")
-        st.sidebar.write(f"{case['case_id']} · {case['company']} → **{status}**")
+        with st.sidebar.container(border=True):
+            st.markdown(
+                f"**{case['case_id']} · {case['company']}**  \n{status_badge_html(status)}",
+                unsafe_allow_html=True,
+            )
 
     selected_id = st.session_state.get("selected")
     pending_ids = {c["case_id"] for c in pending}
