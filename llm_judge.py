@@ -5,8 +5,12 @@
 """
 
 import os
+from pathlib import Path
 
+from dotenv import load_dotenv
 from openai import OpenAI
+
+load_dotenv(Path(__file__).parent / ".env")
 
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
 

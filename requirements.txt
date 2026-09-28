@@ -2,3 +2,4 @@ langgraph>=1.2
 langgraph-checkpoint-sqlite>=2.0
 streamlit>=1.60
 openai>=1.40
+python-dotenv>=1.0

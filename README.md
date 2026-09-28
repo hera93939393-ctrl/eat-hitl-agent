@@ -36,6 +36,9 @@ $env:OPENAI_API_KEY = "sk-..."
 export OPENAI_API_KEY="sk-..."
 ```
 
+또는 이 폴더에 `.env` 파일을 만들어 `OPENAI_API_KEY=sk-...` 한 줄을 넣어도 됩니다
+(`.env`는 `.gitignore`에 있어 저장소에 올라가지 않습니다).
+
 키가 없으면 자동으로 규칙 기반 기본 문구로 대체되어 데모 자체는 계속 동작합니다.
 필요하면 `OPENAI_MODEL` 환경변수로 모델을 바꿀 수 있습니다(기본값 `gpt-4o-mini`).
 
