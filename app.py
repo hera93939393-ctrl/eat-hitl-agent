@@ -31,7 +31,16 @@ CSS = """
     padding-left: 28px; padding-right: 28px;
     box-shadow: 0 4px 14px rgba(63,142,247,0.28);
 }
-h1 { color: #14284B !important; font-weight: 800 !important; }
+.page-title {
+    background: linear-gradient(90deg, #14284B, #1E3A6B);
+    color: #fff; font-weight: 800; font-size: 1.7rem;
+    padding: 18px 24px; border-radius: 14px; margin-bottom: 1.4rem;
+}
+.detail-title {
+    background: #EAF3FF; color: #14284B; font-weight: 800; font-size: 1.25rem;
+    padding: 14px 20px; border-radius: 10px; margin: 6px 0 18px 0;
+    border-left: 6px solid #2F6FED;
+}
 .field-icon {
     width: 34px; height: 34px; border-radius: 50%;
     background: #EAF3FF; color: #2F6FED; display: flex;
@@ -101,7 +110,10 @@ def render_detail(app, case_id: str) -> None:
     payload = snapshot.interrupts[0].value
     case = CASES_BY_ID[case_id]
 
-    st.markdown(f"### 📋 [{case_id}] {case['company']} 심사 확인")
+    st.markdown(
+        f'<div class="detail-title">📋 [{case_id}] {case["company"]} 심사 확인</div>',
+        unsafe_allow_html=True,
+    )
 
     row1 = st.columns(2)
     render_field_card(row1[0], "📝", "요청 원문", payload["요청 원문"])
@@ -172,7 +184,10 @@ def main() -> None:
     st.set_page_config(page_title="eaT 서류심사 승인 데모", layout="wide", page_icon="🍚")
     st.markdown(CSS, unsafe_allow_html=True)
     st.markdown('<span class="top-pill">HITL Approval Demo</span>', unsafe_allow_html=True)
-    st.title("공공급식통합플랫폼(eaT) 공급업체 서류심사")
+    st.markdown(
+        '<div class="page-title">공공급식통합플랫폼(eaT) 공급업체 서류심사</div>',
+        unsafe_allow_html=True,
+    )
 
     app = get_app()
     ensure_intake(app)
