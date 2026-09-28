@@ -26,18 +26,18 @@ CSS = """
 .top-pill {
     display: block; text-align: center; margin: 0 auto 1.6rem auto;
     background: linear-gradient(90deg, #3E8EF7, #63B3FF);
-    color: #fff; font-weight: 600; font-size: 0.95rem;
+    color: #fff; font-weight: 600; font-size: 1.425rem;
     padding: 10px 0; border-radius: 999px; width: fit-content;
     padding-left: 28px; padding-right: 28px;
     box-shadow: 0 4px 14px rgba(63,142,247,0.28);
 }
 .page-title {
     background: linear-gradient(90deg, #14284B, #1E3A6B);
-    color: #fff; font-weight: 800; font-size: 1.7rem;
+    color: #fff; font-weight: 800; font-size: 2.55rem;
     padding: 18px 24px; border-radius: 14px; margin-bottom: 1.4rem;
 }
 .detail-title {
-    background: #FFE066; color: #14284B; font-weight: 800; font-size: 1.55rem;
+    background: #FFE066; color: #14284B; font-weight: 800; font-size: 2.325rem;
     padding: 16px 22px; border-radius: 10px; margin: 6px 0 18px 0;
     border-left: 6px solid #E0A800;
 }
@@ -48,10 +48,10 @@ CSS = """
     align-items: center; justify-content: center; font-size: 16px;
 }
 .field-label { color: #6B7686; font-size: 1.56rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
-.field-value { color: #16233F; font-size: 0.95rem; margin-top: 2px; line-height: 1.4; }
+.field-value { color: #16233F; font-size: 1.425rem; margin-top: 2px; line-height: 1.4; }
 .badge {
     display: inline-block; padding: 3px 12px; border-radius: 999px;
-    font-size: 12px; font-weight: 700;
+    font-size: 18px; font-weight: 700;
 }
 .badge-blue { background: #EAF3FF; color: #2F6FED; }
 .badge-gray { background: #F1F2F5; color: #5B6472; }
@@ -60,10 +60,21 @@ CSS = """
 .badge-red { background: #FDEBEB; color: #E1483F; }
 .pass-banner {
     background: #EAF3FF; border-left: 4px solid #2F6FED; color: #14284B;
-    padding: 12px 16px; border-radius: 8px; font-size: 0.92rem; margin: 14px 0;
+    padding: 12px 16px; border-radius: 8px; font-size: 1.38rem; margin: 14px 0;
 }
 section[data-testid="stSidebar"] { background: #F7FAFF; }
 div[data-testid="stSidebarUserContent"] h3 { color: #14284B; }
+
+/* Scale the remaining native Streamlit text ~1.5x */
+section[data-testid="stSidebar"] h3 { font-size: 27px !important; }
+section[data-testid="stSidebar"] p { font-size: 24px !important; }
+[data-testid="stButtonGroup"] p,
+[data-testid="stBaseButton-secondary"] p,
+[data-testid="stBaseButton-primary"] p,
+[data-testid="stWidgetLabel"] p { font-size: 21px !important; }
+div[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p { font-size: 24px !important; }
+.stTextInput input { font-size: 21px !important; }
+div[data-testid="stAlert"] p { font-size: 24px !important; }
 </style>
 """
 
